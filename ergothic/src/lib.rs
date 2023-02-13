@@ -12,7 +12,6 @@
 
 extern crate argparse;
 extern crate bson;
-extern crate mongodb;
 extern crate prettytable;
 extern crate rand;
 extern crate serde;
@@ -45,7 +44,6 @@ mod simulation;
 /// development and production modes.
 mod startup;
 
-
 // Following are the elements of the public API.
 
 /// Sample trait defines an object acting as a statistical sample.
@@ -57,30 +55,32 @@ pub use measure::MeasureIdx;
 
 /// Public interface to measure registry and the entry point function.
 pub struct Simulation {
-  name: String,
-  measure_registry: measure::MeasureRegistry,
+    name: String,
+    measure_registry: measure::MeasureRegistry,
 }
 
 impl Simulation {
-  /// Constructs a new simulation.
-  pub fn new<N: ToString>(name: N) -> Simulation {
-    Simulation {
-      name: name.to_string(),
-      measure_registry: measure::MeasureRegistry::new(),
+    /// Constructs a new simulation.
+    pub fn new<N: ToString>(name: N) -> Simulation {
+        Simulation {
+            name: name.to_string(),
+            measure_registry: measure::MeasureRegistry::new(),
+        }
     }
-  }
 
-  /// Registers a measure in the underlying measure registry and returns its
-  /// positional index safely wrapped in the `MeasureIdx` type.
-  pub fn add_measure<N: ToString>(&mut self, name: N) -> MeasureIdx {
-    self.measure_registry.register(name.to_string())
-  }
+    /// Registers a measure in the underlying measure registry and returns its
+    /// positional index safely wrapped in the `MeasureIdx` type.
+    pub fn add_measure<N: ToString>(&mut self, name: N) -> MeasureIdx {
+        self.measure_registry.register(name.to_string())
+    }
 
-  /// Entry point function. All ergothic simulations should call this function.
-  /// Consumes `self` to indicate that the simulation runs in an infinite loop
-  /// and never returns.
-  pub fn run<S: simulation::Sample, F>(self, f: F)
-    where F: Fn(&S, &mut measure::Measures) {
-    startup::run_simulation(&self.name, self.measure_registry, f);
-  }
+    /// Entry point function. All ergothic simulations should call this function.
+    /// Consumes `self` to indicate that the simulation runs in an infinite loop
+    /// and never returns.
+    pub fn run<S: simulation::Sample, F>(self, f: F)
+    where
+        F: Fn(&S, &mut measure::Measures),
+    {
+        startup::run_simulation(&self.name, self.measure_registry, f);
+    }
 }
